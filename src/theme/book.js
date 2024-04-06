@@ -103,7 +103,7 @@ function playground_text(playground, hidden = true) {
         var result_block = code_block.querySelector(".result");
         if (!result_block) {
             result_block = document.createElement('code');
-            result_block.className = 'result hljs language-bash';
+            result_block.className = 'result hljs language-rust';
 
             code_block.append(result_block);
         }
@@ -145,6 +145,7 @@ function playground_text(playground, hidden = true) {
             } else {
                 result_block.innerText = response.result;
                 result_block.classList.remove("result-no-output");
+                hljs.highlightBlock(result_block);
             }
         })
         .catch(error => result_block.innerText = "Playground Communication: " + error.message);
