@@ -1015,7 +1015,10 @@ fn hide_lines_rust(content: &str) -> String {
 
 fn hide_lines_with_prefix(content: &str, prefix: &str) -> String {
     let mut result = String::with_capacity(content.len());
-    for line in content.lines() {
+    let mut lines = content.lines().peekable();
+    while let Some(line) = lines.next() {
+        // Don't include newline on the last line.
+        let newline = if lines.peek().is_none() { "" } else { "\n" };
         if line.trim_start().starts_with(prefix) {
             let pos = line.find(prefix).unwrap();
             let (ws, rest) = (&line[..pos], &line[pos + prefix.len()..]);
@@ -1023,12 +1026,12 @@ fn hide_lines_with_prefix(content: &str, prefix: &str) -> String {
             result += "<span class=\"boring\">";
             result += ws;
             result += rest;
-            result += "\n";
+            result += newline;
             result += "</span>";
             continue;
         }
         result += line;
-        result += "\n";
+        result += newline;
     }
     result
 }
@@ -1261,10 +1264,10 @@ mod tests {
         let inputs = [
           (
            "<code class=\"language-python\">~hidden()\nnothidden():\n~    hidden()\n    ~hidden()\n    nothidden()</code>",
-           "<code class=\"language-python\"><span class=\"boring\">hidden()\n</span>nothidden():\n<span class=\"boring\">    hidden()\n</span><span class=\"boring\">    hidden()\n</span>    nothidden()\n</code>",),
+           "<code class=\"language-python\"><span class=\"boring\">hidden()\n</span>nothidden():\n<span class=\"boring\">    hidden()\n</span><span class=\"boring\">    hidden()\n</span>    nothidden()</code>",),
            (
             "<code class=\"language-python hidelines=!!!\">!!!hidden()\nnothidden():\n!!!    hidden()\n    !!!hidden()\n    nothidden()</code>",
-            "<code class=\"language-python hidelines=!!!\"><span class=\"boring\">hidden()\n</span>nothidden():\n<span class=\"boring\">    hidden()\n</span><span class=\"boring\">    hidden()\n</span>    nothidden()\n</code>",),
+            "<code class=\"language-python hidelines=!!!\"><span class=\"boring\">hidden()\n</span>nothidden():\n<span class=\"boring\">    hidden()\n</span><span class=\"boring\">    hidden()\n</span>    nothidden()</code>",),
         ];
         for (src, should_be) in &inputs {
             let got = hide_lines(
