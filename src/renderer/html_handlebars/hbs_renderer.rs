@@ -1022,6 +1022,7 @@ fn hide_lines_with_prefix(content: &str, prefix: &str) -> String {
         if line.trim_start().starts_with(prefix) {
             let pos = line.find(prefix).unwrap();
             let (ws, rest) = (&line[..pos], &line[pos + prefix.len()..]);
+            let rest = rest.strip_prefix(' ').unwrap_or(rest);
 
             result += "<span class=\"boring\">";
             result += ws;
