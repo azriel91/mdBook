@@ -610,7 +610,7 @@ function playground_text(playground, hidden = true) {
         text: function (trigger) {
             hideTooltip(trigger);
             let playground = trigger.closest("pre");
-            return playground_text(playground, false);
+            return playground_text(playground, false).replace(/\n\n/g, '\n');
         }
     });
 
